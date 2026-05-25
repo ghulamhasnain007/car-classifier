@@ -1,0 +1,6 @@
+venv/
+dataset/
+ml/
+__pycache__/
+*.pyc
+.git/
