@@ -18,3 +18,5 @@ build/
 *.egg
 *.pyo
 *.pyd
+/venv/
+/venv
