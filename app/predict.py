@@ -15,7 +15,6 @@ def preprocess_image(image: Image.Image) -> np.ndarray:
     image_array = np.transpose(image_array, (2, 0, 1))
     return np.expand_dims(image_array, axis=0).astype(np.float32)
 
-
 def predict_image(image: Image.Image):
     session = get_model()
     input_name = session.get_inputs()[0].name
