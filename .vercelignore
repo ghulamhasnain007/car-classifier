@@ -3,4 +3,5 @@ dataset/
 ml/
 __pycache__/
 *.pyc
+models/*.pth
 .git/

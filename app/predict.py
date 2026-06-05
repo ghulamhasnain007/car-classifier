@@ -1,24 +1,26 @@
-import torch
-from torchvision import transforms
+import numpy as np
 from PIL import Image
-from app.model import device, get_model
+from app.model import get_model
 
 classes = ["700CC", "1200CC"]
 
-transform = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor(),
-    transforms.Normalize([0.485, 0.456, 0.406],
-                         [0.229, 0.224, 0.225])
-])
+mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+
+
+def preprocess_image(image: Image.Image) -> np.ndarray:
+    image = image.resize((224, 224))
+    image_array = np.asarray(image, dtype=np.float32) / 255.0
+    image_array = (image_array - mean) / std
+    image_array = np.transpose(image_array, (2, 0, 1))
+    return np.expand_dims(image_array, axis=0).astype(np.float32)
+
 
 def predict_image(image: Image.Image):
-    model = get_model()
+    session = get_model()
+    input_name = session.get_inputs()[0].name
 
-    image = transform(image).unsqueeze(0).to(device)
+    outputs = session.run(None, {input_name: preprocess_image(image)})
+    predicted = int(np.argmax(outputs[0], axis=1)[0])
 
-    with torch.no_grad():
-        outputs = model(image)
-        _, predicted = torch.max(outputs, 1)
-
-    return classes[predicted.item()]
+    return classes[predicted]
