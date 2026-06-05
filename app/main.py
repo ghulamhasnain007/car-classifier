@@ -21,6 +21,10 @@ from app.predict import predict_image
 
 app = FastAPI()
 
+@app.get("/")
+async def hello(request: Request):
+    return "hello wold"
+
 @app.post("/predict")
 async def predict(request: Request):
     try:

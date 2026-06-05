@@ -20,3 +20,6 @@ build/
 *.pyd
 /venv/
 /venv
+/dataset
+dataset/
+*.ipynb_checkpoints
