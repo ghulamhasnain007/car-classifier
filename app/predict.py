@@ -15,11 +15,34 @@ def preprocess_image(image: Image.Image) -> np.ndarray:
     image_array = np.transpose(image_array, (2, 0, 1))
     return np.expand_dims(image_array, axis=0).astype(np.float32)
 
+# def predict_image(image: Image.Image):
+#     session = get_model()
+#     input_name = session.get_inputs()[0].name
+
+#     outputs = session.run(None, {input_name: preprocess_image(image)})
+#     predicted = int(np.argmax(outputs[0], axis=1)[0])
+
+#     return classes[predicted]
+
 def predict_image(image: Image.Image):
     session = get_model()
     input_name = session.get_inputs()[0].name
 
     outputs = session.run(None, {input_name: preprocess_image(image)})
-    predicted = int(np.argmax(outputs[0], axis=1)[0])
 
-    return classes[predicted]
+    # Get model output for the single image
+    scores = outputs[0][0]
+
+    # Convert logits to probabilities if needed
+    exp_scores = np.exp(scores - np.max(scores))
+    probabilities = exp_scores / exp_scores.sum()
+
+    predicted_idx = int(np.argmax(probabilities))
+
+    return {
+        "predicted_class": classes[predicted_idx],
+        "probabilities": {
+            class_name: float(prob)
+            for class_name, prob in zip(classes, probabilities)
+        }
+    }
